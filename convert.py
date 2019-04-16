@@ -16,7 +16,7 @@ ALL_DMPS = [
 def get_random_dmp():
     return ALL_DMPS[random.randrange(len(ALL_DMPS))]
 
-def is_sm_ddr_single(chart): return "dance-single" in chart[2]
+def is_sm_ddr_single(chart): return "dance-single" in chart[1]
 
 def split_bars(lines):
     ret = []
@@ -24,14 +24,14 @@ def split_bars(lines):
     for line in lines:
         line = line.strip()
         if line=='': continue
-        if line.startswith(';'):
-            ret.append(crt)
-            return ret
-        if line.startswith(','):
+        if line.startswith(',') or line.startswith(';'):
             ret.append(crt)
             crt = []
         else:
             crt.append(line)
+    if len(crt)>=1:
+        ret.append(crt)
+    return ret
 
 def join_bars(bars):
     ret = []
@@ -117,6 +117,7 @@ def get_incoming_action_in_bar(recent_action, bar):
     return None
 
 def ddrbar_to_pumpbar(dmp, recent_action, ddrbar):
+    ddrbar = [line.replace('M','0') for line in ddrbar]
     incoming_action = get_incoming_action_in_bar(recent_action, ddrbar)
     crtdmp = dmp if incoming_action == None else rand_matching_dmp(dmp,recent_action,incoming_action)
     retbar = []
@@ -146,16 +147,15 @@ def convert_sm_chart(chart):
     '''
     # Metadata lines.
     ans = []
-    ans.append("//---------------pump-single-----------------")
     ans.append("#NOTES:")
     ans.append("     pump-single:")
     ans.append("     ddr-piu-convertor:")
-    ans.append(chart[4])    # Specifying Easy/Hard/Crazy. For some reason in sm format "Edit" won't work.
-    ans.append(chart[5])    # Specifying meter.
-    ans.append(chart[6])    # Some weird radar value that I dont understand.
+    ans.append(chart[3])    # Specifying Easy/Hard/Crazy. For some reason in sm format "Edit" won't work.
+    ans.append(chart[4])    # Specifying meter.
+    ans.append(chart[5])    # Some weird radar value that I dont understand.
 
     # Score lines.
-    ddr_score = split_bars(chart[7:])
+    ddr_score = split_bars(chart[6:])
     piu_score = ddrscore_to_pumpscore(ddr_score)
     ans += join_bars(piu_score)
     return ans
@@ -163,14 +163,20 @@ def convert_sm_chart(chart):
 def convert_sm(path):
     with open(path, encoding="utf-8") as f: lines = f.readlines()
     lines = [line.replace('\n','').replace('\r','') for line in lines]
-    chart_starter_indices = [i for i,line in enumerate(lines) if line.startswith(r'//--')]
+    lines = [line for line in lines if not line.strip().startswith('//')]
+    chart_starter_indices = [i for i,line in enumerate(lines) if line.strip().startswith(r'#NOTES:')]
     metadata_lines = lines[:chart_starter_indices[0]]
     ans = metadata_lines
     for i,index in enumerate(chart_starter_indices):
         index_end = chart_starter_indices[i+1] if i<len(chart_starter_indices)-1 else len(lines)
         chart = lines[index:index_end]
+        print("Chart detected. Showing the first 8 lines.")
+        for line in chart[:8]: print(line)
         if is_sm_ddr_single(chart):
+            print("Above is a ddr single.")
             ans += convert_sm_chart(chart)
+        else:
+            print("Above is NOT a ddr single.")
     ans = [line+'\n' for line in ans]
     with open(path, "w", encoding="utf-8") as f:
         f.writelines(ans)
