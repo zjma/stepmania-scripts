@@ -32,4 +32,4 @@ for sub_dir, dirs, files in os.walk(root_dir):
 			target_sub_dir = sub_dir.replace(root_dir, target_root_dir, 1)
 			shutil.copytree(sub_dir, target_sub_dir)
 			# Move the new chart to the target directory.
-			shutil.move('tmp', target_sub_dir + os.sep + filename)
+			shutil.move('tmp', os.path.join(target_sub_dir, filename))
