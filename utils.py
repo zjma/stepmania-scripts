@@ -354,7 +354,7 @@ def split_routine(ssc_file, target_description, result_file, chart_type):
 			break
 
 		# Read multiple line configs.
-		while line[-2] != ';':
+		while line.split()[0] != ';':
 			line, line_number = readLineUntilValid(ssc_file, line_number)
 
 		# Get next line.
