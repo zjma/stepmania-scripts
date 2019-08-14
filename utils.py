@@ -167,7 +167,7 @@ def read_header(ssc, line_number):
 			# The description should match with the description in the
 			# parameters.
 			description = line.split(':')[1].split(';')[0]
-			print('Processing "{}"\n'.format(description))
+			print(f'Processing "{description}"\n')
 			line = '#DESCRIPTION:' + description + '[{variation}];\n'
 		elif line.startswith('#DIFFICULTY'):
 			# Difficulty should always be "Edit".
@@ -191,7 +191,7 @@ def read_and_split_routine_stepmania(ssc, line_number):
 	# Get first line.
 	line, line_number = readLineUntilValid(ssc, line_number)
 
-	print('Left is starting in line {}: "{}".'.format(line_number, line))
+	print(f'Left is starting in line {line_number}: "{line}".')
 	left = []
 	while line[0] != '&':
 		left.append(line)
@@ -202,7 +202,7 @@ def read_and_split_routine_stepmania(ssc, line_number):
 	while line[0] == '&' or line == '\n':
 		line, line_number = readLineUntilValid(ssc, line_number)
 
-	print('Right is starting in line {}.'.format(line_number))
+	print(f'Right is starting in line {line_number}.')
 	right = []
 	while line[0] != ';':
 		right.append(line)
@@ -233,7 +233,7 @@ def read_and_split_routine_stepf2(ssc, line_number):
 	# Get first line.
 	line, line_number = readLineUntilValid(ssc, line_number)
 
-	print('Notes are starting in line {}: "{}".'.format(line_number, line))
+	print(f'Notes are starting in line {line_number}: "{line}".')
 	left, right = [], []
 	l_hold = [False for _ in range(10)]
 	r_hold = [False for _ in range(10)]
@@ -255,8 +255,6 @@ def read_and_split_routine_stepf2(ssc, line_number):
 		line, line_number = readLineUntilValid(ssc, line_number)
 	left.append(';\n')
 	right.append(';\n')
-
-	print(left)
 
 	return left, right	
 
@@ -360,7 +358,7 @@ def split_routine(ssc_file, target_description, result_file, chart_type):
 		# Get next line.
 		line, line_number = readLineUntilValid(ssc_file, line_number, is_comment_invalid=False)
 
-	print('Charts started in line {}.'.format(line_number))
+	print(f'Charts started in line {line_number}.')
 
 	# Read through charts until the requested one is found.
 	while True:
@@ -371,8 +369,8 @@ def split_routine(ssc_file, target_description, result_file, chart_type):
 		# The first line of a chart should be like
 		# "//------ pump-something something ------".
 		assert(re.match(r'//-+\s*[a-zA-z0-9-]*-+', line),
-			'Line "{}" is not a header start.'.format(line))
-		print('New chart starting in line {}.'.format(line_number))
+			f'Line "{line}" is not a header start.')
+		print(f'New chart starting in line {line_number}.')
 
 		header, description, steps_type = read_header(ssc_file, line_number)
 
