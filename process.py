@@ -2,17 +2,21 @@ import sys
 import re
 from utils import *
 
-if len(sys.argv) < 2:
+if os.name != 'nt':
+	print('As of now, only Windows is supported. :(')
+	exit()
+
+if len(sys.argv) < 3:
 	print('Usage: process.py <ssc file path> <result file path>')
 	exit()
 
 ssc_filepath = sys.argv[1]
 result_filepath = sys.argv[2]
 
-print('Searching for all routine charts in "{}".'.format(ssc_filepath))
+print(f'Searching for all routine charts in "{ssc_filepath}".')
 
 routines = find_routines(ssc_filepath)
-print('The routine charts in "{}" are {}.'.format(ssc_filepath, routines))
+print(f'The routine charts in "{scc_filepath}" are {routines}.')
 
 copy_file(ssc_filepath, result_filepath)
 
